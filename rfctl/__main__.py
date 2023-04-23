@@ -17,7 +17,7 @@ import os
 @click.pass_context
 def cli(ctx: click.Context, manifest):
     click.echo("Function manifest founding in %s" % manifest)
-    ctx.obj, funcdef = {}, {}
+    ctx.obj, funcdef = {"working_dir": os.getcwd()}, {}
     validate_error = None
     with open(manifest, 'r', encoding="utf-8") as fd:
         funcdef = yaml.load(fd, Loader=yaml.FullLoader)

@@ -2,6 +2,7 @@ from aws_lambda_builders.builder import LambdaBuilder
 from aws_lambda_builders.architecture import X86_64
 import traceback
 import tempfile
+import zipfile
 import click
 import os
 
@@ -21,28 +22,29 @@ def get_runtime(runtime: str):
 
 
 @click.command()
+@click.option('--out', default=os.path.join(os.getcwd(), "lambda.zip"), type=click.Path(exists=False, dir_okay=False, resolve_path=True))
 @click.pass_context
-def build_command(ctx: click.Context):
+def build_command(ctx: click.Context, out: str):
     funcdef = ctx.obj["funcdef"]
-    click.echo("Building function %s/%s" % (funcdef["metadata"]["namespace"], funcdef["metadata"]["name"]))
+    click.echo("Building function %s/%s to %s" % (funcdef["metadata"]["namespace"], funcdef["metadata"]["name"], out))
     build = funcdef["spec"]["build"]
     capabilities = {
         "language": build["language"],
         "dependency_manager": get_dependency_manager(build["language"])
     }
-    with tempfile.TemporaryDirectory() as scratch_dir:
-        click.echo("Building in temporary directory %s" % scratch_dir)
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        click.echo("Building in temporary directory %s" % tmp_dir)
         try:
             params = {
                 "source_dir": build["source"],
-                "artifacts_dir": os.path.join(os.getcwd(), "dist"),
-                "scratch_dir": scratch_dir,
+                "artifacts_dir": os.path.join(tmp_dir, "lambda"),
+                "scratch_dir": os.path.join(tmp_dir, "tmp"),
                 "manifest_path": os.path.join(build["source"], build["manifest"]),
                 "architecture": build["architecture"],
                 "runtime": get_runtime(funcdef["spec"]["runtime"]),
                 "optimizations": {},
                 "options": {
-                    "artifact_executable_name": funcdef["spec"]["entry"],
+                    "artifact_executable_name": funcdef["spec"]["handler"],
                 }
             }
             builder = LambdaBuilder(
@@ -68,5 +70,14 @@ def build_command(ctx: click.Context):
                 experimental_flags=params.get("experimental_flags", []),
                 build_in_source=params.get("build_in_source", None),
             )
+            click.echo("Packaging function %s/%s to %s" % (funcdef["metadata"]["namespace"], funcdef["metadata"]["name"], out))
+            if os.path.isfile(out):
+                os.remove(out)
+            with zipfile.ZipFile(out, mode='w') as zip_file:
+                directory = os.path.join(tmp_dir, "lambda")
+                for root, _, files in os.walk(directory):
+                    for file in files:
+                        file_path = os.path.join(root, file)
+                        zip_file.write(file_path, os.path.relpath(file_path, directory))
         except Exception as ex:
             click.echo("Build error:\n %s" % traceback.format_exc())

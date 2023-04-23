@@ -7,6 +7,6 @@ spec:
     manifest: requirements.txt
     language: "python"
     architecture: "x86_64"
-  entry: "main.lambda_handler"
+  handler: "main.lambda_handler"
   timeout: 120
   runtime: "python3.10"
