@@ -2,10 +2,12 @@ from rfctl.schema import funcdef_schema, set_funcdef_defaults
 from rfctl.build import build_command
 from rfctl.create import create_command
 from rfctl.delete import delete_command
+from rfctl.get import get_command
 from rfctl.update_code import update_code_command
 from rfctl.update_config import update_config_command
 from rfctl.create_url import create_url_command
 from rfctl.delete_url import delete_url_command
+from rfctl.get_url import get_url_command
 import jsonschema
 import click
 import yaml
@@ -44,10 +46,12 @@ def cli(ctx: click.Context, endpoint, manifest):
 cli.add_command(build_command, "build")
 cli.add_command(create_command, "create")
 cli.add_command(delete_command, "delete")
+cli.add_command(get_command, "get")
 cli.add_command(update_code_command, "update-code")
 cli.add_command(update_config_command, "update-config")
 cli.add_command(create_url_command, "create-url")
 cli.add_command(delete_url_command, "delete-url")
+cli.add_command(get_url_command, "get-url")
 
 if __name__ == "__main__":
     cli({}, *(), **{})
