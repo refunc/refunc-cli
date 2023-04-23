@@ -13,9 +13,10 @@ import os
 
 
 @click.group()
+@click.option('--endpoint', default=os.environ.get("AWS_DEFAULT_ENDPOINT", ""))
 @click.option('--manifest', default="lambda.yaml", type=click.Path(exists=True, dir_okay=False, resolve_path=True))
 @click.pass_context
-def cli(ctx: click.Context, manifest):
+def cli(ctx: click.Context, endpoint, manifest):
     click.echo("Function manifest founding in %s" % manifest)
     ctx.obj, funcdef = {"working_dir": os.getcwd()}, {}
     validate_error = None
@@ -29,7 +30,14 @@ def cli(ctx: click.Context, manifest):
     if not validate_error is None:
         click.echo("Function manifest error %s" % validate_error)
         exit(-1)
+    if not endpoint:
+        click.echo("Endpoint can't be empty")
+        exit(-1)
     os.chdir(os.path.dirname(manifest))
+    os.environ.update({
+        "AWS_DEFAULT_REGION": funcdef["metadata"]["namespace"]
+    })
+    ctx.obj["endpoint"] = endpoint
     ctx.obj["funcdef"] = set_funcdef_defaults(funcdef)
 
 

@@ -25,15 +25,18 @@ def get_runtime(runtime: str):
 @click.option('--out', default=os.path.join(os.getcwd(), "lambda.zip"), type=click.Path(exists=False, dir_okay=False, resolve_path=True))
 @click.pass_context
 def build_command(ctx: click.Context, out: str):
+    do_build(ctx, out)
+
+
+def do_build(ctx: click.Context, out: str):
     funcdef = ctx.obj["funcdef"]
-    click.echo("Building function %s/%s to %s" % (funcdef["metadata"]["namespace"], funcdef["metadata"]["name"], out))
     build = funcdef["spec"]["build"]
     capabilities = {
         "language": build["language"],
         "dependency_manager": get_dependency_manager(build["language"])
     }
     with tempfile.TemporaryDirectory() as tmp_dir:
-        click.echo("Building in temporary directory %s" % tmp_dir)
+        click.echo("Building function %s/%s in temporary directory %s" % (funcdef["metadata"]["namespace"], funcdef["metadata"]["name"], tmp_dir))
         try:
             params = {
                 "source_dir": build["source"],
@@ -79,5 +82,6 @@ def build_command(ctx: click.Context, out: str):
                     for file in files:
                         file_path = os.path.join(root, file)
                         zip_file.write(file_path, os.path.relpath(file_path, directory))
+            ctx.obj["out"] = out
         except Exception as ex:
             click.echo("Build error:\n %s" % traceback.format_exc())
