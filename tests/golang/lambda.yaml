@@ -1,0 +1,11 @@
+metadata:
+  name: demo
+  namespace: dpool
+spec:
+  build:
+    source: src
+    manifest: go.mod
+    language: "go"
+  handler: "handler"
+  timeout: 120
+  runtime: "golang1.x"
