@@ -3,3 +3,4 @@
 *.pyc
 dist/
 lambda.zip
+*.egg-info
