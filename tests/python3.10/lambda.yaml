@@ -1,5 +1,5 @@
 metadata:
-  name: demo
+  name: demo-py310
   namespace: dpool
 spec:
   build:
