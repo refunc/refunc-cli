@@ -43,14 +43,17 @@ def init_command(ctx: click.Context):
     else:
         click.echo("Function manifest %s exists" % funcdef)
         sys.exit(-1)
-    do_init_source(language)
+    do_init_source(language, {"name": name, "namespace": namespace})
 
 
-def do_init_source(lang: str):
+def do_init_source(lang: str, meta: dict):
     source_items: dict = sources.get(lang)
     if not source_items:
         return
-    for path, content in source_items.items():
+    for path, src_template in source_items.items():
+        content = src_template
+        for key, value in meta.items():
+            content = content.replace("{%s}" % key, value)
         if not os.path.exists(path):
             with open(path, 'w', encoding="utf-8") as f:
                 f.write(content)
