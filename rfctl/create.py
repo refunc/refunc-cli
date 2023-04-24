@@ -18,3 +18,4 @@ def create_command(ctx: click.Context):
                    "--runtime", funcdef["spec"]["runtime"],
                    "--timeout", funcdef["spec"]["timeout"]]
     lambda_command(ctx.obj["endpoint"], lambda_args)
+    os.remove(out)

@@ -25,7 +25,6 @@ def run(cmd, env):
     Thread(target=output_reader, args=[process.stderr, sys.stderr]).start()
 
     process.wait()
-    sys.exit(process.returncode)
 
 
 def lambda_command(endpoint_url, args):

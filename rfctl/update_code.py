@@ -15,3 +15,4 @@ def update_code_command(ctx: click.Context):
                    "--function-name", funcdef["metadata"]["name"],
                    "--zip-file", "fileb://{}".format(out)]
     lambda_command(ctx.obj["endpoint"], lambda_args)
+    os.remove(out)
