@@ -9,7 +9,8 @@ import os
 def create_command(ctx: click.Context):
     funcdef = ctx.obj["funcdef"]
     out = os.path.join(ctx.obj["working_dir"], "lambda.zip")
-    do_build(ctx, out)
+    if not do_build(ctx, out):
+        return
     click.echo("Creating function %s/%s" % (funcdef["metadata"]["namespace"], funcdef["metadata"]["name"]))
     lambda_args = ["create-function",
                    "--function-name", funcdef["metadata"]["name"],

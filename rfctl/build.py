@@ -28,7 +28,7 @@ def build_command(ctx: click.Context, out: str):
     do_build(ctx, out)
 
 
-def do_build(ctx: click.Context, out: str):
+def do_build(ctx: click.Context, out: str) -> bool:
     funcdef = ctx.obj["funcdef"]
     build = funcdef["spec"]["build"]
     capabilities = {
@@ -83,5 +83,7 @@ def do_build(ctx: click.Context, out: str):
                         file_path = os.path.join(root, file)
                         zip_file.write(file_path, os.path.relpath(file_path, directory))
             ctx.obj["out"] = out
+            return True
         except Exception as ex:
             click.echo("Build error:\n %s" % traceback.format_exc())
+            return False
