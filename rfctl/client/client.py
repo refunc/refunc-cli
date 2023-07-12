@@ -7,15 +7,17 @@ import base64
 
 class LambdaClient:
     def __init__(self, region_name):
+        endpoint_url = os.environ.get("AWS_DEFAULT_ENDPOINT")
         self.lambda_client = boto3.client('lambda',
                                           region_name=region_name,
-                                          endpoint_url=os.environ.get("AWS_DEFAULT_ENDPOINT"),
-                                          use_ssl=False,
+                                          endpoint_url=endpoint_url,
+                                          use_ssl=endpoint_url.startswith("https"),
                                           aws_access_key_id=os.environ.get('AWS_ACCESS_KEY_ID', "__none__"),
                                           aws_secret_access_key=os.environ.get('AWS_SECRET_ACCESS_KEY', "__none__"))
 
     def invoke_function(self, function_name, function_params, get_log=False):
-        response = self.lambda_client.invoke(FunctionName=function_name, Payload=json.dumps(function_params), LogType='Tail' if get_log else 'None')
+        response = self.lambda_client.invoke(FunctionName=function_name,
+                                             Payload=json.dumps(function_params), LogType='Tail' if get_log else 'None')
         metadata = response["ResponseMetadata"]
         payload = response["Payload"]
         if get_log:
