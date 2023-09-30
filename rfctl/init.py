@@ -16,6 +16,7 @@ spec:
   handler: {}
   timeout: 120
   runtime: "{}"
+  concurrency: 1
 """
 
 

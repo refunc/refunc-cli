@@ -13,3 +13,8 @@ def update_config_command(ctx: click.Context):
                    "--runtime", funcdef["spec"]["runtime"],
                    "--timeout", funcdef["spec"]["timeout"]]
     lambda_command(ctx.obj["endpoint"], lambda_args)
+    concurrency = funcdef["spec"].get("concurrency",1)
+    lambda_args = ["put-function-concurrency",
+                   "--function-name", funcdef["metadata"]["name"],
+                   "--reserved-concurrent-executions", concurrency]
+    lambda_command(ctx.obj["endpoint"], lambda_args)
