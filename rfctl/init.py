@@ -17,6 +17,8 @@ spec:
   timeout: 120
   runtime: "{}"
   concurrency: 1
+  environment:
+    ENV_TEST: TEST
 """
 
 
