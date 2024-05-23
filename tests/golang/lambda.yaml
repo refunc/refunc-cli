@@ -1,11 +1,13 @@
 metadata:
   name: demo
-  namespace: dpool
+  namespace: default
 spec:
   build:
     source: src
     manifest: go.mod
     language: "go"
+    environment:
+      CGO_ENABLED: "0"
   handler: "handler"
   timeout: 120
   runtime: "golang1.x"

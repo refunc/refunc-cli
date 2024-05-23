@@ -30,11 +30,13 @@ def build_command(ctx: click.Context, out: str):
 
 def do_build(ctx: click.Context, out: str) -> bool:
     funcdef = ctx.obj["funcdef"]
-    build = funcdef["spec"]["build"]
+    build: dict = funcdef["spec"]["build"]
     capabilities = {
         "language": build["language"],
         "dependency_manager": get_dependency_manager(build["language"])
     }
+    envs: dict = build.get("environment", {})
+    os.environ.update(envs)
     with tempfile.TemporaryDirectory() as tmp_dir:
         click.echo("Building function %s/%s in temporary directory %s" % (funcdef["metadata"]["namespace"], funcdef["metadata"]["name"], tmp_dir))
         try:

@@ -1,6 +1,6 @@
 metadata:
   name: demo-py310
-  namespace: dpool
+  namespace: default
 spec:
   build:
     source: src
