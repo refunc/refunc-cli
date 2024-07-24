@@ -19,6 +19,16 @@ spec:
   concurrency: 1
   environment:
     ENV_TEST: TEST
+#  events:
+#    - name: hourly
+#      type: cron
+#      mapping:
+#        cron: 0 * * * *
+#        location: Asia/Shanghai
+#        args:
+#          var1: value1
+#        saveLog: false
+#        saveResult: false
 """
 
 

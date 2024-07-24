@@ -3,6 +3,7 @@ import sys
 import subprocess
 import six
 from threading import Thread
+from io import BytesIO
 
 
 def to_str(s):
@@ -11,23 +12,34 @@ def to_str(s):
     return s
 
 
-def run(cmd, env):
+def run(cmd, env, fetch_out=False):
+    out_io = BytesIO()
 
     def output_reader(pipe, out):
         with pipe:
             for line in iter(pipe.readline, b''):
+                if fetch_out:
+                    out.write(line)
+                    continue
                 line = to_str(line)
                 out.write(line)
                 out.flush()
-
+    # print(" ".join(cmd))
     process = subprocess.Popen(cmd, stderr=subprocess.PIPE, stdout=subprocess.PIPE, stdin=subprocess.PIPE, env=env)
-    Thread(target=output_reader, args=[process.stdout, sys.stdout]).start()
-    Thread(target=output_reader, args=[process.stderr, sys.stderr]).start()
+    if fetch_out:
+        Thread(target=output_reader, args=[process.stdout, out_io]).start()
+        Thread(target=output_reader, args=[process.stderr, out_io]).start()
+    else:
+        Thread(target=output_reader, args=[process.stdout, sys.stdout]).start()
+        Thread(target=output_reader, args=[process.stderr, sys.stderr]).start()
 
     process.wait()
 
+    out_io.seek(0)
+    return out_io.read()
 
-def lambda_command(endpoint_url, args):
+
+def lambda_command(endpoint_url, args, fetch_out=False):
     # prepare cmd args
     cmd_args = ["aws", "--no-verify-ssl", "--endpoint-url", endpoint_url, "lambda"]
     cmd_args.extend([str(x) for x in args])
@@ -45,4 +57,4 @@ def lambda_command(endpoint_url, args):
     env_dict['AWS_ACCESS_KEY_ID'] = os.environ.get('AWS_ACCESS_KEY_ID', '_not_needed_locally_')
     env_dict['AWS_SECRET_ACCESS_KEY'] = os.environ.get('AWS_SECRET_ACCESS_KEY', '_not_needed_locally_')
     # run the command
-    run(cmd_args, env_dict)
+    return run(cmd_args, env_dict, fetch_out)

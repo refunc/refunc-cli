@@ -1,5 +1,6 @@
 from rfctl.awslocal import lambda_command
 from rfctl.build import do_build
+from rfctl.common import reduce_event_source
 import click
 import os
 
@@ -13,9 +14,9 @@ def create_command(ctx: click.Context):
         return
     click.echo("Creating function %s/%s" % (funcdef["metadata"]["namespace"], funcdef["metadata"]["name"]))
     environment = []
-    environment_spec:dict = funcdef["spec"].get("environment",{})
-    for env,value in environment_spec.items():
-        environment.append("{}={}".format(env,value))
+    environment_spec: dict = funcdef["spec"].get("environment", {})
+    for env, value in environment_spec.items():
+        environment.append("{}={}".format(env, value))
     lambda_args = ["create-function",
                    "--function-name", funcdef["metadata"]["name"],
                    "--handler", funcdef["spec"]["handler"],
@@ -25,9 +26,20 @@ def create_command(ctx: click.Context):
     if environment:
         lambda_args.extend(["--environment", '''Variables={%s}''' % ",".join(environment)])
     lambda_command(ctx.obj["endpoint"], lambda_args)
-    concurrency = funcdef["spec"].get("concurrency",1)
+    # concurrency
+    concurrency = funcdef["spec"].get("concurrency", 1)
     lambda_args = ["put-function-concurrency",
                    "--function-name", funcdef["metadata"]["name"],
                    "--reserved-concurrent-executions", concurrency]
     lambda_command(ctx.obj["endpoint"], lambda_args)
+    # events
+    if funcdef["spec"].get("events"):
+        for event in funcdef["spec"].get("events"):
+            event_source_arn = "arn:{}:{}".format(event["type"], event["name"])
+            self_managed_event_source = reduce_event_source(event)
+            lambda_args = ["create-event-source-mapping",
+                           "--function-name", funcdef["metadata"]["name"],
+                           "--event-source-arn", event_source_arn,
+                           "--self-managed-event-source", self_managed_event_source]
+            lambda_command(ctx.obj["endpoint"], lambda_args)
     os.remove(out)
