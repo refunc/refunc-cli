@@ -5,10 +5,10 @@ import click
 
 @click.command()
 @click.pass_context
-def create_url_command(ctx: click.Context):
+def update_url_command(ctx: click.Context):
     funcdef = ctx.obj["funcdef"]
-    click.echo("Creating url for function %s/%s" % (funcdef["metadata"]["namespace"], funcdef["metadata"]["name"]))
-    lambda_args = ["create-function-url-config",
+    click.echo("Updating url for function %s/%s" % (funcdef["metadata"]["namespace"], funcdef["metadata"]["name"]))
+    lambda_args = ["update-function-url-config",
                    "--function-name", funcdef["metadata"]["name"],
                    "--auth-type", "None"]
     if funcdef["spec"].get("url", {}).get("cors"):

@@ -19,6 +19,14 @@ spec:
   concurrency: 1
   environment:
     ENV_TEST: TEST
+#  url:
+#    cors:
+#      allowCredentials: true
+#      allowHeaders: "*"
+#      allowMethods: "*"
+#      allowOrigins: "*"
+#      exposeHeaders: "*"
+#      maxAge: 300
 #  events:
 #    - name: hourly
 #      type: cron

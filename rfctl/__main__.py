@@ -7,6 +7,7 @@ from rfctl.update_code import update_code_command
 from rfctl.update_config import update_config_command
 from rfctl.create_url import create_url_command
 from rfctl.delete_url import delete_url_command
+from rfctl.update_url import update_url_command
 from rfctl.get_url import get_url_command
 from rfctl.init import init_command
 import jsonschema
@@ -60,6 +61,7 @@ cli.add_command(update_code_command, "update-code")
 cli.add_command(update_config_command, "update-config")
 cli.add_command(create_url_command, "create-url")
 cli.add_command(delete_url_command, "delete-url")
+cli.add_command(update_url_command, "update-url")
 cli.add_command(get_url_command, "get-url")
 
 if __name__ == "__main__":
