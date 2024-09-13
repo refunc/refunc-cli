@@ -55,8 +55,7 @@ funcdef_schema = {
                     "minimum": 0
                 },
                 "runtime": {
-                    "type": "string",
-                    "enum": ["python3.7", "python3.8", "python3.9", "python3.10", "golang1.x", "go1.x"]
+                    "type": "string"
                 }
             },
             "required": ["build", "handler", "timeout", "runtime"]

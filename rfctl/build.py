@@ -5,6 +5,7 @@ import tempfile
 import zipfile
 import click
 import os
+import re
 
 
 def get_dependency_manager(lang: str):
@@ -16,9 +17,16 @@ def get_dependency_manager(lang: str):
 
 
 def get_runtime(runtime: str):
+    match = None
     if "golang" in runtime:
-        return runtime.replace("golang", "go")
-    return runtime
+        pattern = r'go1\.x'
+        match = re.search(pattern, runtime.replace("golang", "go"))
+    if "python" in runtime:
+        pattern = r'python\d\.\d+'
+        match = re.search(pattern, runtime)
+    if not match:
+        raise Exception("not support runtime {}".format(runtime))
+    return match.group(0)
 
 
 @click.command()
@@ -40,13 +48,15 @@ def do_build(ctx: click.Context, out: str) -> bool:
     with tempfile.TemporaryDirectory() as tmp_dir:
         click.echo("Building function %s/%s in temporary directory %s" % (funcdef["metadata"]["namespace"], funcdef["metadata"]["name"], tmp_dir))
         try:
+            runtime = get_runtime(funcdef["spec"]["runtime"])
+            click.echo("Building function %s/%s with builder runtime %s" % (funcdef["metadata"]["namespace"], funcdef["metadata"]["name"], runtime))
             params = {
                 "source_dir": build["source"],
                 "artifacts_dir": os.path.join(tmp_dir, "lambda"),
                 "scratch_dir": os.path.join(tmp_dir, "tmp"),
                 "manifest_path": os.path.join(build["source"], build["manifest"]),
                 "architecture": build["architecture"],
-                "runtime": get_runtime(funcdef["spec"]["runtime"]),
+                "runtime": runtime,
                 "optimizations": {},
                 "options": {
                     "artifact_executable_name": funcdef["spec"]["handler"],
