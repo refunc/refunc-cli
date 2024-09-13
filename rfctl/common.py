@@ -8,8 +8,9 @@ def reduce_event_source(event: dict) -> str:
     fields = []
     for key, val in mapping.items():
         if isinstance(val, dict):
-            val = "'{}'".format(json.dumps(val))
-        fields.append("{}={}".format(key, val))
+            val = json.dumps(val)
+        # Fix: string val can't contains "'"
+        fields.append("{}='{}'".format(key, val))
     return "Endpoints={"+",".join(fields)+"}"
 
 
