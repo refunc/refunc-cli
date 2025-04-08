@@ -1,6 +1,6 @@
 import json
 
-event_arns = ["arn:cron"]
+event_arns = ["arn:*"]
 
 
 def reduce_event_source(event: dict) -> str:
