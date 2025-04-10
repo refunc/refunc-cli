@@ -5,17 +5,17 @@ import os
 import sys
 
 template = """metadata:
-  name: {}
-  namespace: {}
+  name: {name}
+  namespace: {namespace}
 spec:
   build:
     source: .
-    manifest: {}
-    language: {}
+    manifest: {manifest}
+    language: {language}
     architecture: x86_64
-  handler: {}
+  handler: {handler}
   timeout: 120
-  runtime: "{}"
+  runtime: "{runtime}"
   concurrency: 1
   environment:
     ENV_TEST: TEST
@@ -37,6 +37,18 @@ spec:
 #          var1: value1
 #        saveLog: false
 #        saveResult: false
+#    - name: mcp
+#      type: mcp
+#      mapping:
+#        args:
+#          toolset: mcp-toolset-name
+#          desc: Func's MCP Description
+#          schema:
+#            type: object
+#            properties: {{}}
+#            required: []
+#        saveLog: false
+#        saveResult: false
 """
 
 
@@ -49,6 +61,7 @@ def init_command(ctx: click.Context):
     namespace = read_user_variable("Namespace", None)
     language = read_user_choice("Language", ["python", "go"])
     runtime, manifest = None, None
+    handler = ""
     if language == "python":
         runtime = read_user_choice("Runtime", ["python3.10", "python3.9", "python3.8"])
         manifest = "requirements.txt"
@@ -57,7 +70,8 @@ def init_command(ctx: click.Context):
         runtime = "golang1.x"
         manifest = "go.mod"
         handler = "handler"
-    content = template.format(name, namespace, manifest, language, handler, runtime)
+    content = template.format(**{"name": name, "namespace": namespace, "manifest": manifest,
+                              "language": language, "handler": handler, "runtime": runtime})
     if not os.path.exists(funcdef):
         with open(funcdef, 'w', encoding="utf-8") as f:
             f.write(content)
