@@ -8,7 +8,7 @@ here = os.path.abspath(os.path.dirname(__file__))
 
 setup_args = dict(
     name='refunc-cli',
-    version='1.3.7',
+    version='1.3.8',
     description='refunc command line tools',
     author='arvin',
     license='MIT',

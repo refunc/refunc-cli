@@ -42,7 +42,7 @@ spec:
 #      mapping:
 #        args:
 #          toolset: mcp-toolset-name
-#          desc: Func's MCP Description
+#          desc: Func MCP Description #Cannot contain single quotes
 #          schema:
 #            type: object
 #            properties: {{}}
