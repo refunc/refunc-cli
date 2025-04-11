@@ -41,12 +41,14 @@ spec:
 #      type: mcp
 #      mapping:
 #        args:
-#          toolset: mcp-toolset-name
-#          desc: Func MCP Description #Cannot contain single quotes
-#          schema:
-#            type: object
-#            properties: {{}}
-#            required: []
+#          token: mcp-token-secret-name
+#          tools:
+#            - name: echo-hello
+#              desc: Func MCP Tool Description #Cannot contain single quotes
+#              schema:
+#                type: object
+#                properties: {{}}
+#                required: []
 #        saveLog: false
 #        saveResult: false
 """
